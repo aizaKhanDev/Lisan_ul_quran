@@ -21,8 +21,8 @@ export default function RegisterPage() {
     },
     {
       step: 3,
-      title: "Zoom Link Sent",
-      description: "Get your personalized Zoom link for the free trial class",
+      title: "Teams Link Sent",
+      description: "Get your personalized Microsoft Teams link for the free trial class",
       icon: MessageCircle,
       color: "bg-amber-100 text-amber-900",
     },
@@ -291,73 +291,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Pricing Plans */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <Badge className="bg-amber-100 text-amber-800 px-4 py-2 mb-6">Flexible Pricing</Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 font-arabic mb-4">
-              Choose Your Learning Path
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Affordable pricing options designed to make Islamic education accessible to everyone
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <Card
-                key={index}
-                className={`border-2 ${plan.color} hover:shadow-xl transition-all duration-300 relative ${plan.popular ? "transform scale-105" : ""}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-blue-900 text-white px-4 py-2">Most Popular</Badge>
-                  </div>
-                )}
-
-                <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-xl text-slate-800 font-arabic">{plan.name}</CardTitle>
-                  <div className="space-y-2">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold text-slate-800">{plan.price}</span>
-                      <span className="text-slate-600">{plan.period}</span>
-                    </div>
-                    <CardDescription className="text-slate-600">{plan.description}</CardDescription>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4">
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-slate-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="pt-4">
-                    <button
-                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
-                        plan.popular
-                          ? "bg-blue-900 hover:bg-blue-800 text-white"
-                          : "border-2 border-blue-900 text-blue-900 hover:bg-blue-50 bg-white"
-                      }`}
-                    >
-                      Choose {plan.name}
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <p className="text-slate-600 mb-4">All plans include free trial class and 24/7 support</p>
-            <Badge className="bg-green-100 text-green-800 px-4 py-2">
-              💰 Special Offer: Save 20% on your first 3 months!
-            </Badge>
-          </div>
-        </div>
+        {/* Pricing section removed as per request */}
 
         {/* Trust Indicators */}
         <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-3xl p-8 lg:p-12">

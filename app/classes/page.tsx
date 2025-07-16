@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Users, Video, Calendar, ExternalLink, BookOpen, Globe, Play, Shield } from "lucide-react"
+import { motion } from "framer-motion";
 import { useState } from "react"
 
 export default function ClassesPage() {
@@ -12,81 +13,42 @@ export default function ClassesPage() {
   const timeSlots = [
     {
       id: 1,
-      time: "6:00 AM - 7:00 AM",
-      ukTime: "6:00 AM",
-      usaTime: "1:00 AM EST",
-      courses: ["Fajr Quran Class", "Morning Arabic"],
-      teacher: "Ustadh Ahmad Ibn Yusuf",
-      students: 8,
-      maxStudents: 12,
-      available: true,
-      level: "All Levels",
-      zoomId: "123-456-789",
-    },
-    {
-      id: 2,
-      time: "8:00 AM - 9:00 AM",
-      ukTime: "8:00 AM",
-      usaTime: "3:00 AM EST",
-      courses: ["Kids Quran Adventure", "Tajweed Basics"],
-      teacher: "Ustadha Fatima Zahra",
+      time: "6:00 PM - 7:00 PM",
+      ukTime: "6:00 PM",
+      usaTime: "1:00 PM EST",
+      courses: ["Quran Reading (Nazra)"],
+      teacher: "Certified by Wafaq ul Madaris",
       students: 12,
       maxStudents: 15,
       available: true,
       level: "Beginner",
-      zoomId: "234-567-890",
+      teamsLink: "https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1",
     },
     {
-      id: 3,
-      time: "4:00 PM - 5:00 PM",
-      ukTime: "4:00 PM",
-      usaTime: "11:00 AM EST",
-      courses: ["Quran Recitation", "Islamic Studies"],
-      teacher: "Ustadh Muhammad Al-Qari",
-      students: 15,
-      maxStudents: 15,
-      available: false,
-      level: "Intermediate",
-      zoomId: "345-678-901",
-    },
-    {
-      id: 4,
-      time: "6:00 PM - 7:00 PM",
-      ukTime: "6:00 PM",
-      usaTime: "1:00 PM EST",
-      courses: ["Hifz Program", "Advanced Arabic"],
-      teacher: "Ustadh Ahmad Ibn Yusuf",
+      id: 2,
+      time: "7:00 PM - 8:00 PM",
+      ukTime: "7:00 PM",
+      usaTime: "2:00 PM EST",
+      courses: ["Quran Memorization (Hifz)"],
+      teacher: "Certified by Wafaq ul Madaris",
       students: 10,
       maxStudents: 12,
       available: true,
-      level: "Advanced",
-      zoomId: "456-789-012",
+      level: "Intermediate",
+      teamsLink: "https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1",
     },
     {
-      id: 5,
+      id: 3,
       time: "8:00 PM - 9:00 PM",
       ukTime: "8:00 PM",
       usaTime: "3:00 PM EST",
-      courses: ["Evening Quran", "Family Classes"],
-      teacher: "Ustadha Fatima Zahra",
-      students: 18,
-      maxStudents: 20,
+      courses: ["Tajweed Excellence"],
+      teacher: "Certified by Wafaq ul Madaris",
+      students: 8,
+      maxStudents: 10,
       available: true,
-      level: "All Levels",
-      zoomId: "567-890-123",
-    },
-    {
-      id: 6,
-      time: "10:00 PM - 11:00 PM",
-      ukTime: "10:00 PM",
-      usaTime: "5:00 PM EST",
-      courses: ["Adult Beginners", "Quran Translation"],
-      teacher: "Ustadh Muhammad Al-Qari",
-      students: 14,
-      maxStudents: 16,
-      available: true,
-      level: "Beginner",
-      zoomId: "678-901-234",
+      level: "Advanced",
+      teamsLink: "https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1",
     },
   ]
 
@@ -97,7 +59,7 @@ export default function ClassesPage() {
       teacher: "Ustadh Muhammad Al-Qari",
       students: 12,
       maxStudents: 15,
-      zoomLink: "https://zoom.us/j/123456789",
+      teamsLink: "https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1",
       duration: "60 minutes",
       status: "Starting Soon",
       course: "Nazra",
@@ -108,7 +70,7 @@ export default function ClassesPage() {
       teacher: "Ustadha Fatima Zahra",
       students: 8,
       maxStudents: 12,
-      zoomLink: "https://zoom.us/j/987654321",
+      teamsLink: "https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1",
       duration: "45 minutes",
       status: "Open",
       course: "Kids Program",
@@ -119,7 +81,7 @@ export default function ClassesPage() {
       teacher: "Ustadha Fatima Zahra",
       students: 10,
       maxStudents: 15,
-      zoomLink: "https://zoom.us/j/456789123",
+      teamsLink: "https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1",
       duration: "90 minutes",
       status: "Open",
       course: "Arabic",
@@ -152,10 +114,10 @@ export default function ClassesPage() {
         <div className="text-center mb-12">
           <Badge className="bg-blue-100 text-blue-800 px-4 py-2 mb-6">Live Classes</Badge>
           <h1 className="text-4xl lg:text-6xl font-bold text-slate-800 mb-6 font-arabic">
-            Class Schedule &<span className="text-blue-900 block">Zoom Links</span>
+            Class Schedule &<span className="text-blue-900 block">Microsoft Teams Links</span>
           </h1>
           <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-            Join our interactive live classes from anywhere in the world. All sessions are conducted via Zoom with
+            Join our interactive live classes from anywhere in the world. All sessions are conducted via Microsoft Teams with
             experienced Islamic scholars and qualified teachers.
           </p>
         </div>
@@ -191,10 +153,16 @@ export default function ClassesPage() {
 
           <div className="grid lg:grid-cols-3 gap-6">
             {upcomingClasses.map((classItem, index) => (
-              <Card
+              <motion.div
                 key={index}
-                className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-xl transition-all duration-300"
+                initial={{ y: 60, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.4, duration: 0.8, delay: index * 0.15 }}
+                viewport={{ once: true, amount: 0.4 }}
               >
+                <Card
+                  className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-xl transition-all duration-300"
+                >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between mb-3">
                     <Badge className={getStatusColor(classItem.status)}>{classItem.status}</Badge>
@@ -233,14 +201,14 @@ export default function ClassesPage() {
 
                   <Button
                     className="w-full bg-blue-900 hover:bg-blue-800 text-white rounded-lg py-6"
-                    onClick={() => window.open(classItem.zoomLink, "_blank")}
+                    onClick={() => window.open("https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1", "_blank")}
                   >
-                    <Video className="mr-2 h-4 w-4" />
-                    Join Zoom Class
-                    <ExternalLink className="ml-2 h-4 w-4" />
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Join Microsoft Teams Class
                   </Button>
                 </CardContent>
               </Card>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -274,11 +242,18 @@ export default function ClassesPage() {
                 </thead>
                 <tbody>
                   {timeSlots.map((slot, index) => (
-                    <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <motion.tr
+                      key={index}
+                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                      initial={{ x: -100, opacity: 0 }}
+                      whileInView={{ x: 0, opacity: 1 }}
+                      transition={{ type: "spring", bounce: 0.3, duration: 0.7, delay: index * 0.12 }}
+                      viewport={{ once: true, amount: 0.4 }}
+                    >
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-slate-500" />
-                          <span className="font-medium text-slate-800">{slot.time}</span>
+                          <span className="font-medium text-slate-800">Flexible Time</span>
                         </div>
                       </td>
                       <td className="p-4 text-slate-600 font-medium">
@@ -321,13 +296,13 @@ export default function ClassesPage() {
                               : "bg-gray-300 text-gray-500 cursor-not-allowed"
                           } rounded-lg`}
                           disabled={!slot.available}
-                          onClick={() => window.open(`https://zoom.us/j/${slot.zoomId}`, "_blank")}
+                          onClick={() => window.open("https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1", "_blank")}
                         >
-                          <Play className="mr-1 h-3 w-3" />
-                          {slot.available ? "Join" : "Full"}
+                          <ExternalLink className="mr-1 h-3 w-3" />
+                          {slot.available ? "Join Teams" : "Full"}
                         </Button>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
@@ -340,8 +315,8 @@ export default function ClassesPage() {
           <Card className="border-2 border-slate-200 hover:shadow-lg transition-all duration-300">
             <CardHeader className="bg-gradient-to-r from-blue-50 to-white">
               <CardTitle className="text-xl text-slate-800 flex items-center gap-2 font-arabic">
-                <Video className="h-5 w-5 text-blue-600" />
-                Zoom Class Guidelines
+                <ExternalLink className="h-5 w-5 text-blue-600" />
+                Microsoft Teams Class Guidelines
               </CardTitle>
               <CardDescription className="text-slate-600">
                 Follow these guidelines for the best learning experience
@@ -477,34 +452,35 @@ export default function ClassesPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Globe className="h-8 w-8 text-blue-900" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Internet Connection</h3>
-              <p className="text-sm text-slate-600">Stable broadband connection (minimum 5 Mbps)</p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Video className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Device</h3>
-              <p className="text-sm text-slate-600">Computer, tablet, or smartphone with camera</p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Users className="h-8 w-8 text-amber-600" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Zoom App</h3>
-              <p className="text-sm text-slate-600">Latest version of Zoom installed and updated</p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto">
-                <BookOpen className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Learning Materials</h3>
-              <p className="text-sm text-slate-600">Quran, notebook, and digital resources provided</p>
-            </div>
+            {[
+              {
+                icon: <Globe className="h-8 w-8 text-blue-900" />, bg: "bg-blue-100", title: "Internet Connection", desc: "Stable broadband connection (minimum 5 Mbps)"
+              },
+              {
+                icon: <Video className="h-8 w-8 text-green-600" />, bg: "bg-green-100", title: "Device", desc: "Computer, tablet, or smartphone with camera"
+              },
+              {
+                icon: <Users className="h-8 w-8 text-amber-600" />, bg: "bg-amber-100", title: "Microsoft Teams App", desc: "Latest version of Microsoft Teams installed and updated"
+              },
+              {
+                icon: <BookOpen className="h-8 w-8 text-purple-600" />, bg: "bg-purple-100", title: "Learning Materials", desc: "Quran, notebook, and digital resources provided"
+              }
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                className="text-center space-y-3"
+                initial={{ y: 60, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.4, duration: 0.8, delay: i * 0.15 }}
+                viewport={{ once: true, amount: 0.4 }}
+              >
+                <div className={`w-16 h-16 ${item.bg} rounded-2xl flex items-center justify-center mx-auto`}>
+                  {item.icon}
+                </div>
+                <h3 className="font-semibold text-slate-800">{item.title}</h3>
+                <p className="text-sm text-slate-600">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>

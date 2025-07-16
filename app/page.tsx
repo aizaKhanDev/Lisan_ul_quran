@@ -1,7 +1,8 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useState, FormEvent } from "react";
 import Counter from "@/components/ui/counter";
 import { motion } from "framer-motion";
+import stringSimilarity from 'string-similarity';
 
 interface TypingTextProps {
   text: string;
@@ -39,41 +40,48 @@ export const TypingText = ({ text, speed = 80, className = "", style }: TypingTe
 import { Button, MotionButton } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BookOpen, Users, Clock, Globe, Star, MessageCircle, Play, CheckCircle, Quote, Circle, Mail } from "lucide-react"
+import { BookOpen, Users, Clock, Globe, Star, MessageCircle, Play, CheckCircle, Quote, Circle, Mail, Award } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { AnimateSection } from "@/components/ui/animate-section"
-import { HeroCursorBg } from "@/components/ui/hero-cursor-bg"
+import { AnimateSection } from "@/components/ui/animate-section";
+import { HeroCursorBg } from "@/components/ui/hero-cursor-bg";
+// Remove Swiper and react-icons imports due to missing modules/types
+
+const testimonials = [
+  {
+    name: "Sarah Johnson",
+    location: "London, UK",
+    flag: "🇬🇧",
+    verified: true,
+    photo: "/testinomial_img.jpg",
+    rating: 5,
+    course: "Kids Quran Program",
+    quote: "My daughter has learned so much in just 3 months. The teachers are patient and the online format works perfectly for our busy schedule.",
+  },
+  {
+    name: "Ahmed Hassan",
+    location: "New York, USA",
+    flag: "🇺🇸",
+    verified: true,
+    photo: "/testinomial_img2.jpg",
+    rating: 5,
+    course: "Tajweed Mastery",
+    quote: "The Tajweed course has transformed my recitation. Alhamdulillah, I can now read with proper pronunciation and beautiful melody.",
+  },
+  {
+    name: "Fatima Ali",
+    location: "Manchester, UK",
+    flag: "🇬🇧",
+    verified: true,
+    photo: "/testinomial_img1.jpg",
+    rating: 5,
+    course: "Arabic Grammar",
+    quote: "As a working mother, the flexible timing and quality teaching have made it possible for me to finally learn Arabic properly.",
+  },
+  // Add more testimonials as needed
+];
 
 export default function HomePage() {
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      location: "London, UK",
-      flag: "🇬🇧",
-      text: "My daughter has learned so much in just 3 months. The teachers are patient and the online format works perfectly for our busy schedule.",
-      rating: 5,
-      course: "Kids Quran Program",
-    },
-    
-    {
-      name: "Ahmed Hassan",
-      location: "New York, USA",
-      flag: "🇺🇸",
-      text: "The Tajweed course has transformed my recitation. Alhamdulillah, I can now read with proper pronunciation and beautiful melody.",
-      rating: 5,
-      course: "Tajweed Mastery",
-    },
-    {
-      name: "Fatima Ali",
-      location: "Manchester, UK",
-      flag: "🇬🇧",
-      text: "As a working mother, the flexible timing and quality teaching have made it possible for me to finally learn Arabic properly.",
-      rating: 5,
-      course: "Arabic Grammar",
-    },
-  ]
-
   const courseHighlights = [
     {
       title: "Quran Reading (Nazra)",
@@ -101,6 +109,156 @@ export default function HomePage() {
     },
   ]
  
+  // Chatbot state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    { from: "bot", text: "Assalamu Alaikum! How can I help you today?" }
+  ]);
+
+  // FAQ pairs for chatbot
+  const faqPairs = [
+    {
+      q: /ass?alam(\s*o)?\s*alaikum|salaam|salam|السلام|سلام/i,
+      a: "Wa Alaikum Assalam! Welcome to Lisan-ul-Quran Academy. We offer Quran Reading (Nazra), Quran Memorization (Hifz), and Tajweed Excellence courses for all ages. Classes are held online via Microsoft Teams with certified teachers (Wafaq ul Madaris). Timings are flexible for UK, USA, and international students. How can I assist you further?"
+    },
+    // --- Existing FAQs ---
+    {
+      q: /course|offer|teach|program|subject|learn/i,
+      a: "We offer Quran reading, Tajweed, Arabic language, and Islamic studies for all ages and levels."
+    },
+    {
+      q: /register|sign ?up|enroll/i,
+      a: "You can register online using our registration form. We'll contact you to schedule your free trial class."
+    },
+    {
+      q: /timing|schedule|class time|when/i,
+      a: "Our classes are flexible and available for UK, USA, and international students. We offer both one-on-one and group sessions."
+    },
+    {
+      q: /contact|support|help|email|whatsapp/i,
+      a: "You can contact us via email at info@lisanulquran.com or WhatsApp at +44 7123 456789."
+    },
+    {
+      q: /trial|free class/i,
+      a: "Yes! We offer a free trial class for all new students. Register online to book yours."
+    },
+    {
+      q: /who.*teacher|ustadh|ustadha|instructor|qualified/i,
+      a: "Our teachers are qualified Islamic scholars and experienced educators, dedicated to helping you learn in a supportive environment."
+    },
+    {
+      q: /location|where|address|online/i,
+      a: "Lisan-ul-Quran Academy is an online platform. You can join from anywhere in the world!"
+    },
+    {
+      q: /price|fee|cost|payment/i,
+      a: "Our fees are affordable and vary by course. Please contact us for detailed pricing."
+    },
+    {
+      q: /miss.*class|makeup|reschedule/i,
+      a: "We offer flexible rescheduling and makeup classes to fit your needs."
+    },
+    {
+      q: /about|academy|who are you/i,
+      a: "Lisan-ul-Quran Academy provides authentic Islamic education through modern technology. Learn Quran, Arabic, and Islamic studies with qualified teachers from the comfort of your home."
+    },
+    // --- Expanded FAQs ---
+    { q: /which.*courses|main.*courses|popular.*courses|nazra|hifz|tajweed/i, a: "Our main courses are Quran Reading (Nazra), Quran Memorization (Hifz), and Tajweed Excellence." },
+    { q: /how.*join.*class|join.*teams|class.*link/i, a: "All classes are conducted via Microsoft Teams. You will receive a Teams invite link after registration." },
+    { q: /who.*certify|certified.*by|wafaq.*madaris/i, a: "All our teachers are certified by Wafaq ul Madaris, ensuring high standards of Islamic education." },
+    { q: /what.*is.*nazra/i, a: "Nazra refers to Quran reading with correct pronunciation and basic Tajweed rules." },
+    { q: /what.*is.*hifz/i, a: "Hifz is the memorization of the Holy Quran. Our Hifz program is structured and supervised by qualified teachers." },
+    { q: /what.*is.*tajweed/i, a: "Tajweed is the science of Quranic pronunciation. Our Tajweed Excellence course helps you master advanced recitation rules." },
+    { q: /how.*long.*course|duration.*course/i, a: "Course durations vary: Nazra (6-12 months), Hifz (2-4 years), Tajweed (8-12 months)." },
+    { q: /age.*limit|who.*can.*join|children|adults/i, a: "We welcome students of all ages, from children to adults. Our programs are tailored for every age group." },
+    { q: /language.*medium|urdu|english|arabic/i, a: "Classes are offered in Urdu, English, and Arabic, depending on student preference." },
+    { q: /how.*pay|payment.*method|fees.*pay/i, a: "We accept payments via bank transfer, credit/debit card, and other secure online methods." },
+    { q: /refund|cancel.*enrollment/i, a: "Please contact our support for refund and cancellation policies. We aim to be flexible and student-friendly." },
+    { q: /class.*size|group.*class.*size/i, a: "Group classes have a maximum of 6 students to ensure personalized attention." },
+    { q: /one.*one|private.*class/i, a: "Yes, we offer 1-on-1 personalized sessions for focused learning." },
+    { q: /family.*package|siblings|discount/i, a: "Our Family Package allows multiple family members to enroll together at a discounted rate." },
+    { q: /class.*recording|missed.*class/i, a: "Class recordings are available upon request if you miss a session." },
+    { q: /technical.*requirement|device|internet/i, a: "You need a computer, tablet, or smartphone with internet access and Microsoft Teams installed." },
+    { q: /how.*contact|support|help/i, a: "You can reach us via email (onlinelisanquran@gmail.com), WhatsApp (+92 316 5249017), or our contact page." },
+    { q: /certificate|completion/i, a: "Certificates are awarded upon successful completion of each course." },
+    { q: /trial.*class|free.*trial/i, a: "We offer a free trial class for all new students. Register to book yours!" },
+    { q: /how.*register|sign.*up/i, a: "Click on the 'Register' button on our website and fill out the form. Our team will contact you soon." },
+    { q: /class.*timing|schedule|flexible.*time/i, a: "We offer flexible scheduling to accommodate students in different time zones (UK, USA, and more)." },
+    { q: /islamic.*studies|arabic.*course/i, a: "In addition to Quran courses, we offer Arabic language and Islamic studies programs." },
+    { q: /how.*qualified.*teacher/i, a: "All teachers are highly qualified, experienced, and certified by Wafaq ul Madaris." },
+    { q: /parent.*involve|progress.*report/i, a: "Parents receive regular progress reports and can communicate directly with teachers." },
+    { q: /class.*platform|zoom|teams/i, a: "We use Microsoft Teams for all classes. Zoom is no longer used." },
+    { q: /class.*start|when.*begin/i, a: "Classes start as soon as your registration is processed and schedule is confirmed." },
+    { q: /how.*many.*students.*class/i, a: "Group classes have up to 6 students. 1-on-1 classes are also available." },
+    { q: /can.*change.*course|switch.*program/i, a: "Yes, you can switch courses or programs after discussing with your teacher." },
+    { q: /holiday|vacation|break/i, a: "We observe major Islamic holidays. You will be notified in advance about any breaks." },
+    { q: /class.*material|books|resources/i, a: "All study materials and digital resources are provided online." },
+    { q: /how.*track.*progress/i, a: "We provide regular feedback and progress tracking for every student." },
+    { q: /is.*safe|privacy|data/i, a: "Your privacy and data are protected. We use secure platforms and never share your information." },
+    { q: /can.*join.*from.*country|international/i, a: "Yes! Students from any country can join our online classes." },
+    { q: /special.*needs|disability/i, a: "We strive to accommodate students with special needs. Please contact us to discuss your requirements." },
+    { q: /how.*long.*session|class.*duration/i, a: "Each class session is typically 45-60 minutes long." },
+    { q: /what.*happens.*after.*register/i, a: "After registration, you will receive a confirmation email and your class schedule." },
+    { q: /can.*parents.*watch|observe/i, a: "Parents are welcome to observe trial classes and communicate with teachers." },
+    { q: /do.*homework|assignments/i, a: "Homework and assignments are given to reinforce learning, especially for children." },
+    { q: /how.*secure.*payment/i, a: "All payments are processed securely using trusted payment gateways." },
+    { q: /can.*pause.*enrollment|take.*break/i, a: "You can pause your enrollment if needed. Please inform us in advance." },
+    { q: /how.*contact.*admin|admin.*dashboard/i, a: "Admins can be contacted via the contact form or WhatsApp for any issues." },
+    { q: /do.*offer.*discount|promo|scholarship/i, a: "We occasionally offer discounts and scholarships. Follow us on social media for updates." },
+    { q: /can.*request.*female.*teacher/i, a: "Yes, female students can request female teachers for their classes." },
+    { q: /how.*access.*teams|teams.*invite/i, a: "You will receive a Microsoft Teams invite link after registration. Just click to join your class." },
+    { q: /can.*change.*timing|reschedule/i, a: "Timings can be adjusted based on mutual availability. Contact your teacher or admin." },
+    { q: /do.*offer.*arabic.*conversation/i, a: "Yes, we offer Arabic conversation and grammar classes for all levels." },
+    { q: /can.*join.*multiple.*courses/i, a: "Yes, you can enroll in more than one course at a time." },
+    { q: /how.*get.*certificate/i, a: "Certificates are issued digitally after successful course completion." },
+    { q: /do.*offer.*weekend.*classes/i, a: "Weekend classes are available. Please mention your preference during registration." },
+    { q: /can.*contact.*teacher.*directly/i, a: "You can communicate with your teacher via Teams or through the admin." },
+    { q: /do.*offer.*islamic.*studies/i, a: "Yes, we offer Islamic studies as part of our curriculum." },
+    { q: /how.*follow.*updates|social.*media/i, a: "Follow us on Facebook and Instagram for updates: facebook.com/profile.php?id=61578041309911 and instagram.com/onlinequran.lisan" },
+    { q: /do.*offer.*demo|sample.*class/i, a: "A demo class can be arranged on request. Contact us to schedule." },
+    { q: /can.*parents.*get.*feedback/i, a: "Parents receive regular feedback and can request meetings with teachers." },
+    { q: /do.*offer.*summer.*camp|intensive.*course/i, a: "We occasionally offer intensive courses and summer camps. Check our website for announcements." },
+    { q: /how.*long.*academy.*exist|when.*founded/i, a: "Lisan-ul-Quran Academy has been serving students since 2020." },
+    { q: /do.*offer.*group.*discount/i, a: "Group discounts are available for families and siblings." },
+    { q: /can.*request.*custom.*schedule/i, a: "Custom schedules can be arranged to fit your needs." },
+    { q: /do.*offer.*parent.*teacher.*meeting/i, a: "Parent-teacher meetings are scheduled regularly to discuss student progress." },
+    { q: /do.*offer.*quran.*translation/i, a: "Quran translation and tafsir classes are available upon request." },
+    { q: /can.*get.*hardcopy.*material/i, a: "Most materials are digital, but hard copies can be arranged for some courses." },
+    { q: /do.*offer.*evening.*classes/i, a: "Evening classes are available for UK and USA time zones." },
+    { q: /can.*request.*extra.*help|tutoring/i, a: "Extra help and tutoring sessions can be arranged if needed." },
+    { q: /do.*offer.*parent.*portal/i, a: "A parent portal is coming soon for easier progress tracking and communication." },
+    { q: /can.*get.*reference|recommendation/i, a: "References and recommendation letters can be provided upon request." },
+    { q: /do.*offer.*islamic.*quiz|competition/i, a: "Islamic quizzes and competitions are held regularly to motivate students." },
+    { q: /can.*visit.*office|physical.*location/i, a: "We are an online-only academy and do not have a physical campus." },
+    { q: /do.*offer.*mobile.*app/i, a: "A mobile app is in development. Stay tuned for updates!" },
+    { q: /can.*request.*demo.*teacher/i, a: "Demo sessions with different teachers can be arranged on request." },
+    { q: /do.*offer.*parent.*orientation/i, a: "Parent orientation sessions are held for new enrollments." },
+    { q: /can.*get.*progress.*certificate/i, a: "Progress certificates are issued at key milestones." },
+    { q: /do.*offer.*quran.*tajweed.*workshop/i, a: "Workshops on Quran and Tajweed are organized throughout the year." },
+    { q: /can.*request.*language.*preference/i, a: "You can choose your preferred language for instruction during registration." },
+    { q: /do.*offer.*islamic.*history/i, a: "Islamic history is included in our Islamic studies curriculum." },
+    { q: /can.*get.*reminder.*class/i, a: "Class reminders are sent via email and WhatsApp." },
+    { q: /do.*offer.*parent.*feedback/i, a: "We value parent feedback and use it to improve our services." },
+    { q: /can.*request.*special.*topic/i, a: "Special topics can be covered on request. Let us know your interests!" },
+  ];
+
+  // Enhanced chat send handler
+  const handleChatSend = (e: FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    const userMsg = chatInput;
+    setChatMessages([...chatMessages, { from: "user", text: userMsg }]);
+    setChatInput("");
+    // Find a matching FAQ
+    const match = faqPairs.find(faq => faq.q.test(userMsg));
+    setTimeout(() => {
+      setChatMessages(msgs => [
+        ...msgs,
+        { from: "bot", text: match ? match.a : "Sorry, I don't have an answer for that yet. Please contact us for more help!" }
+      ]);
+    }, 700);
+  };
 
   return (
     <div className="min-h-screen">
@@ -125,7 +283,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <AnimateSection className="space-y-7">
               <Badge className="bg-blue-900/10 text-blue-900 border-blue-900/20 px-3 py-1 text-sm font-medium hover:text-white transition-colors mb-6">
-                ✨ Trusted by 500+ Students Worldwide
+                ✨ Trusted by 120+ Students Worldwide
               </Badge>
               <AnimateSection delay={0.1}>
                 <h1 className="text-3xl lg:text-4xl font-bold text-slate-800 leading-tight font-arabic">
@@ -168,9 +326,10 @@ export default function HomePage() {
               <div className="flex items-center gap-8 pt-5">
                 {[0,1,2].map((i) => (
                   <AnimateSection key={i} delay={0.4 + i*0.1} className="text-center">
-                    {i === 0 && <><div className="text-2xl font-bold text-blue-900"><Counter to={200} duration={1200} suffix="+" /></div><div className="text-sm text-slate-600 font-medium">Active Students</div></>}
+                    {i === 0 && <><div className="text-2xl font-bold text-blue-900"><Counter to={120} duration={1200} suffix="+" /></div><div className="text-sm text-slate-600 font-medium">Active Students</div></>}
                     {i === 1 && <><div className="text-2xl font-bold text-amber-600"><Counter to={10} duration={1200} suffix="+" /></div><div className="text-sm text-slate-600 font-medium">Expert Teachers</div></>}
-                    {i === 2 && <><div className="text-2xl font-bold text-green-600 flex items-center justify-center"><Counter to={4.9} decimals={1} duration={1200} /><span className="ml-1">★</span></div><div className="text-sm text-slate-600 font-medium">Student Rating</div></>}
+                    {i === 2 && <><div className="text-2xl font-bold text-green-600"><Counter to={80} duration={1200} suffix="+" /></div><div className="text-sm text-slate-600 font-medium">Quran Completions</div></>}
+                    {i === 3 && <><div className="text-2xl font-bold text-purple-600 flex items-center justify-center"><Counter to={4.7} decimals={1} duration={1200} /><span className="ml-1">★</span></div><div className="text-sm text-slate-600 font-medium">Student Rating</div></>}
                   </AnimateSection>
                 ))}
               </div>
@@ -184,7 +343,6 @@ export default function HomePage() {
                     autoPlay
                     muted
                     loop
-                    controls
                     playsInline
                     poster="/family.png"
                   />
@@ -290,235 +448,195 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works - Stylish Islamic Redesign */}
+      {/* Upcoming Events - Elegant Timeline Section */}
       <section className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-5xl text-center">
-          <AnimateSection from="right" className="mb-8">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-blue-900 drop-shadow-lg font-serif inline-block">
-              How It Works
-            </h2>
-            <span className="block h-1 w-32 mx-auto mt-4 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-blue-900 opacity-90 shadow-md"></span>
-          </AnimateSection>
-          <div className="flex flex-col md:flex-row gap-10 justify-center items-stretch mt-14">
-            <AnimateSection className="flex-1" delay={0.05} from="bottom">
-              <div className="relative group bg-white/30 backdrop-blur-xl border border-blue-100 rounded-2xl shadow-2xl p-10 flex flex-col items-center hover:-translate-y-2 hover:shadow-blue-400/30 transition-all duration-300 cursor-pointer overflow-hidden">
-                {/* Islamic geometric SVG accent */}
-                <svg className="absolute -top-6 -left-6 w-20 h-20 text-blue-100 opacity-40 pointer-events-none" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="6" /><path d="M50 10 L58 50 L50 90 L42 50 Z" fill="currentColor" opacity=".15" /></svg>
-                <div className="flex items-center justify-center mb-6 z-10">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-                </div>
-                <h3 className="text-xl font-bold text-blue-900 mb-2 tracking-wide z-10">Register Online</h3>
-                <p className="text-blue-900/80 font-light z-10">Fill out our simple registration form to get started.</p>
-              </div>
-            </AnimateSection>
-            <AnimateSection className="flex-1" delay={0.15} from="bottom">
-              <div className="relative group bg-white/30 backdrop-blur-xl border border-amber-100 rounded-2xl shadow-2xl p-10 flex flex-col items-center hover:-translate-y-2 hover:shadow-amber-400/30 transition-all duration-300 cursor-pointer overflow-hidden">
-                {/* Islamic geometric SVG accent */}
-                <svg className="absolute -top-6 -left-6 w-20 h-20 text-amber-100 opacity-40 pointer-events-none" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="6" /><path d="M50 10 L58 50 L50 90 L42 50 Z" fill="currentColor" opacity=".15" /></svg>
-                <div className="flex items-center justify-center mb-6 z-10">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg>
-                </div>
-                <h3 className="text-xl font-bold text-amber-700 mb-2 tracking-wide z-10">Free Trial Class</h3>
-                <p className="text-amber-900/80 font-light z-10">Experience our teaching style with a free, no-obligation class.</p>
-              </div>
-            </AnimateSection>
-            <AnimateSection className="flex-1" delay={0.25} from="bottom">
-              <div className="relative group bg-white/30 backdrop-blur-xl border border-green-100 rounded-2xl shadow-2xl p-10 flex flex-col items-center hover:-translate-y-2 hover:shadow-green-400/30 transition-all duration-300 cursor-pointer overflow-hidden">
-                {/* Islamic geometric SVG accent */}
-                <svg className="absolute -top-6 -left-6 w-20 h-20 text-green-100 opacity-40 pointer-events-none" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="6" /><path d="M50 10 L58 50 L50 90 L42 50 Z" fill="currentColor" opacity=".15" /></svg>
-                <div className="flex items-center justify-center mb-6 z-10">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 10l-4 4-2-2"/></svg>
-                </div>
-                <h3 className="text-xl font-bold text-green-700 mb-2 tracking-wide z-10">Start Learning</h3>
-                <p className="text-green-900/80 font-light z-10">Choose your course and begin your journey with expert teachers.</p>
-              </div>
-            </AnimateSection>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Us - Modern, Elegant, Animated, Grey Glassmorphism */}
-      <section className="py-20 px-4 bg-blue-900">
-        <div className="container mx-auto max-w-5xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 font-serif inline-block relative">
-            Why Choose Us?
-            <span className="block h-1 w-24 mx-auto mt-3 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 opacity-80"></span>
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-12 text-left">
+            This Week at <span className="text-[#060957]">Lisan-ul-Quran</span>
           </h2>
-          <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch mt-12">
-            <AnimateSection className="flex-1" delay={0.05} from="bottom">
-              <div className="group bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-10 flex flex-col items-center hover:-translate-y-2 hover:shadow-amber-400/30 transition-all duration-300 cursor-pointer relative overflow-hidden">
-                <div className="flex items-center justify-center mb-6">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-award"><circle cx="12" cy="12" r="10"/><path d="M17 17l-5-5-5 5"/><path d="M12 12V7"/></svg>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2 tracking-wide">Top Rated</h3>
-                <p className="text-white/80 font-light">Consistently rated 5 stars by students and parents worldwide.</p>
+          <div className="grid md:grid-cols-4 gap-8">
+            {/* Timeline Dates */}
+            <div className="flex flex-col gap-12 md:col-span-1">
+              <div>
+                <div className="text-lg font-bold text-gray-900">Today</div>
+                <div className="text-sm text-gray-500">Flexible Hours</div>
               </div>
-            </AnimateSection>
-            <AnimateSection className="flex-1" delay={0.15} from="bottom">
-              <div className="group bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-10 flex flex-col items-center hover:-translate-y-2 hover:shadow-blue-400/30 transition-all duration-300 cursor-pointer relative overflow-hidden">
-                <div className="flex items-center justify-center mb-6">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2 tracking-wide">Community</h3>
-                <p className="text-white/80 font-light">Join a global community of learners and scholars.</p>
+              <div>
+                <div className="text-lg font-bold text-gray-900">Tomorrow</div>
+                <div className="text-sm text-gray-500">Flexible Hours</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-gray-900">Tomorrow</div>
+                <div className="text-sm text-gray-500">Flexible Hours</div>
+              </div>
             </div>
-            </AnimateSection>
-            <AnimateSection className="flex-1" delay={0.25} from="bottom">
-              <div className="group bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl p-10 flex flex-col items-center hover:-translate-y-2 hover:shadow-green-400/30 transition-all duration-300 cursor-pointer relative overflow-hidden">
-                <div className="flex items-center justify-center mb-6">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M21 11.5a8.38 8.38 0 0 1-1.9 5.4 8.5 8.5 0 0 1-6.6 3.1 8.38 8.38 0 0 1-5.4-1.9L3 21l2.9-3.1A8.38 8.38 0 0 1 3 11.5a8.5 8.5 0 0 1 3.1-6.6A8.38 8.38 0 0 1 11.5 3a8.5 8.5 0 0 1 6.6 3.1A8.38 8.38 0 0 1 21 11.5z"/></svg>
-            </div>
-                <h3 className="text-xl font-bold text-white mb-2 tracking-wide">Support</h3>
-                <p className="text-white/80 font-light">24/7 support via WhatsApp, email, and live chat.</p>
-            </div>
-            </AnimateSection>
-          </div>
-        </div>
-      </section>
-
-      {/* Animated Stats Section - MIDDLE DUPLICATE */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl">
-              <Users className="mx-auto h-10 w-10 text-blue-700 group-hover:scale-110 transition-transform" />
-              <div className="text-3xl font-bold text-blue-900 mt-2"><Counter to={100} duration={1500} suffix="+" /></div>
-              <div className="text-sm text-slate-600 font-medium mt-1">Students</div>
-            </div>
-            <div className="group bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl shadow-lg p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl">
-              <Star className="mx-auto h-10 w-10 text-amber-500 group-hover:scale-110 transition-transform" />
-              <div className="text-3xl font-bold text-amber-600 mt-2"><Counter to={5} duration={1200} suffix="+" /></div>
-              <div className="text-sm text-slate-600 font-medium mt-1">Expert Teachers</div>
-            </div>
-            <div className="group bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl">
-              <BookOpen className="mx-auto h-10 w-10 text-green-700 group-hover:scale-110 transition-transform" />
-              <div className="text-3xl font-bold text-green-700 mt-2"><Counter to={3} duration={1200} suffix="+" /></div>
-              <div className="text-sm text-slate-600 font-medium mt-1">Courses</div>
-            </div>
-            <div className="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl">
-              <Globe className="mx-auto h-10 w-10 text-purple-700 group-hover:scale-110 transition-transform" />
-              <div className="text-3xl font-bold text-purple-700 mt-2"><Counter to={2} duration={1200} suffix="+" /></div>
-              <div className="text-sm text-slate-600 font-medium mt-1">Countries</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials - White with animation */}
-      <section className="py-24 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl animate-fadeInUp">
-          <div className="text-center mb-20 animate-fadeInDown">
-            <Badge className="bg-blue-100 text-blue-900 px-4 py-2 mb-6 shadow animate-pulse">Student Success Stories</Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 font-serif">What Our Students Say</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">Real experiences from real students around the world.</p>
-          </div>
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-10">
-            {testimonials.map((testimonial, index) => (
+            {/* Event Cards */}
+            <div className="md:col-span-3 flex flex-col gap-8">
+              {/* Event 1 */}
               <motion.div
-                key={index}
-                initial={
-                  index === 0
-                    ? "hiddenLeft"
-                    : index === 2
-                    ? "hiddenRight"
-                    : "hiddenPop"
-                }
-                whileInView="visible"
+                initial={{ opacity: 0, x: -80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, type: "spring", bounce: 0.2, delay: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
-                variants={{
-                  hiddenLeft: { opacity: 0, x: -100 },
-                  hiddenRight: { opacity: 0, x: 100 },
-                  hiddenPop: { opacity: 0, scale: 0.8 },
-                  visible:
-                    index === 0
-                      ? { opacity: 1, x: 0, transition: { duration: 0.7, type: "spring" } }
-                      : index === 2
-                      ? { opacity: 1, x: 0, transition: { duration: 0.7, type: "spring" } }
-                      : { opacity: 1, scale: 1, transition: { duration: 0.7, type: "spring", bounce: 0.4 } }
-                }}
-                className="relative w-full max-w-md mx-auto z-10 group bg-blue-50 rounded-3xl shadow-2xl p-8 flex flex-col items-center"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className="flex flex-col md:flex-row items-center bg-white rounded-xl shadow p-6 gap-6 mb-8"
               >
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-400 via-blue-200 to-white p-[3px] shadow-2xl flex items-center justify-center mb-4 border-2 border-white relative overflow-visible">
-                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-lg">
-                    {testimonial.name === "Sarah Johnson" ? (
-                      <img
-                        src="/testinomial_img.jpg"
-                        alt="Sarah Johnson"
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
-                    ) : testimonial.name === "Fatima Ali" ? (
-                      <img
-                        src="/testinomial_img1.jpg"
-                        alt="Fatima Ali"
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
-                    ) : testimonial.name === "Ahmed Hassan" ? (
-                      <img
-                        src="/testinomial_img2.jpg"
-                        alt="Ahmed Hassan"
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                      />
-                    ) : (
-                      <img
-                        src={`/flags/${testimonial.flag === "🇬🇧" ? "gb" : testimonial.flag === "🇺🇸" ? "us" : "default"}.png`}
-                        alt="Country Flag"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                  {/* Optional: Glassy overlay */}
-                  <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.05) 100%)"
-                  }} />
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Quran Recitation - Beginner</h3>
+                  <p className="text-gray-600 mb-4">
+                    Join our interactive Quran Recitation class for beginners, led by Ustadh Muhammad Al-Qari. Improve your reading, Tajweed, and confidence in a supportive environment.
+                  </p>
+                  <button className="px-5 py-2 rounded bg-[#060957] text-white font-semibold shadow hover:bg-blue-900 transition">
+                    Join Now
+                  </button>
                 </div>
-                <div className="font-semibold text-slate-800 text-lg mb-1">{testimonial.name}</div>
-                <div className="text-sm text-slate-500 mb-2">{testimonial.location}</div>
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400 animate-pulse" />
+                <img src="/person1.jpeg" alt="Quran Recitation" className="w-40 h-28 object-cover rounded-lg" />
+              </motion.div>
+              {/* Event 2 */}
+              <motion.div
+                initial={{ opacity: 0, x: -80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, type: "spring", bounce: 0.2, delay: 0.2 }}
+                viewport={{ once: true, amount: 0.3 }}
+                className="flex flex-col md:flex-row items-center bg-white rounded-xl shadow p-6 gap-6 mb-8"
+              >
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Kids Quran Adventure</h3>
+                  <p className="text-gray-600 mb-4">
+                    A fun, engaging Quran class for children ages 5-12. Includes games, stories, and interactive activities with Ustadha Fatima Zahra.
+                  </p>
+                  <button className="px-5 py-2 rounded bg-[#060957] text-white font-semibold shadow hover:bg-blue-900 transition">
+                    Join Now
+                  </button>
+                </div>
+                <img src="/person2.jpg" alt="Kids Quran Adventure" className="w-40 h-28 object-cover rounded-lg" />
+              </motion.div>
+              {/* Event 3 */}
+              <motion.div
+                initial={{ opacity: 0, x: -80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, type: "spring", bounce: 0.2, delay: 0.4 }}
+                viewport={{ once: true, amount: 0.3 }}
+                className="flex flex-col md:flex-row items-center bg-white rounded-xl shadow p-6 gap-6 mb-8"
+              >
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Arabic Language - Intermediate</h3>
+                  <p className="text-gray-600 mb-4">
+                    Take your Arabic to the next level! Practice conversation, grammar, and Quranic vocabulary with Ustadha Fatima Zahra. Suitable for all ages.
+                  </p>
+                  <button className="px-5 py-2 rounded bg-[#060957] text-white font-semibold shadow hover:bg-blue-900 transition">
+                    Join Now
+                  </button>
+                </div>
+                <img src="/person3.jpg" alt="Arabic Language" className="w-40 h-28 object-cover rounded-lg" />
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-4 bg-[#060957]">
+        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center gap-10">
+          {/* Left Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="flex-1"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <img src="/logo.jpg" alt="Lisan-ul-Quran Logo" className="w-10 h-10 rounded-full" />
+              <span className="text-lg font-bold text-white">Lisan-ul-Quran</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2">Why Learn with Lisan-ul-Quran?</h2>
+            <h3 className="text-lg text-white font-semibold mb-4">Qur'anic Arabic, Tajweed, and Islamic Studies—All in One Place</h3>
+            <p className="text-white mb-4">
+              Empowering you and your family to connect with the Qur'an, wherever you are.  
+              <br />
+              <span className="text-white font-medium">Flexible online classes, expert teachers, and a supportive Islamic environment.</span>
+            </p>
+            <button className="px-6 py-2 rounded bg-white text-blue-900 font-bold shadow hover:bg-white/90 transition">Get Started</button>
+          </motion.div>
+          {/* Right Image/Mockup */}
+          <motion.div
+            initial={{ opacity: 0, x: 80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, type: "spring", bounce: 0.2, delay: 0.2 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="flex-1 flex justify-center"
+          >
+            <img src="/girl.jpg" alt="Lisan-ul-Quran Student" className="w-full max-w-md rounded-2xl shadow-lg border border-white/20" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Testimonials - Modern, Elegant, Responsive Grid */}
+      <section className="py-24 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-black font-serif mb-4 text-center">
+            What Our Students Say
+          </h2>
+          <p className="text-lg text-black mb-12 text-center max-w-2xl mx-auto">
+            Hear from parents and learners who've transformed their connection with the Qur'an through Lisan-ul-Quran.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {testimonials.map((t, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, type: "spring", bounce: 0.2, delay: idx * 0.15 }}
+                viewport={{ once: true, amount: 0.2 }}
+                className="relative bg-[#060957] rounded-3xl shadow-2xl border border-blue-900 p-8 flex flex-col items-center glass-card transition-all duration-300 hover:scale-105"
+              >
+                {/* Profile Image with border glow */}
+                <div className="mb-4 relative">
+                  <div className="w-20 h-20 rounded-full border-4 border-gradient-to-tr from-amber-300 via-teal-300 to-blue-400 shadow-lg overflow-hidden flex items-center justify-center">
+                    <img src={t.photo} alt={t.name} className="w-full h-full object-cover rounded-full" />
+                  </div>
+                  {t.verified && (
+                    <span className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow">
+                      {/* Check icon SVG */}
+                      <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 7.293a1 1 0 00-1.414 0L9 13.586l-2.293-2.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
+                    </span>
+                  )}
+                </div>
+                {/* Name, location, flag */}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg font-bold text-white">{t.name}</span>
+                  <span className="text-2xl text-white">{t.flag}</span>
+                </div>
+                <div className="text-blue-100 text-sm mb-2">{t.location}</div>
+                {/* Star rating */}
+                <div className="flex items-center gap-1 mb-2">
+                  {[...Array(t.rating)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.196-1.54-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.967z" /></svg>
                   ))}
                 </div>
-                <Badge className="bg-blue-100 text-blue-900 text-xs mb-2 animate-fadeInUp">{testimonial.course}</Badge>
-                <p className="text-slate-700 text-base leading-relaxed italic font-serif text-center animate-fadeInUp">{testimonial.text}</p>
+                {/* Course tag */}
+                <span className="bg-gradient-to-r from-amber-200 to-teal-200 text-blue-900 px-3 py-1 rounded-full text-xs font-semibold mb-3 shadow">
+                  {t.course}
+                </span>
+                {/* Quote */}
+                <div className="relative text-center mt-2">
+                  {/* Inline SVG for left quote */}
+                  <svg className="absolute -left-5 -top-2 text-2xl text-amber-300 opacity-60" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.17 17H5a1 1 0 0 1-1-1v-4.17A5 5 0 0 1 9 7h.5a.5.5 0 0 1 .5.5V9a.5.5 0 0 1-.5.5H9a3 3 0 0 0-3 3V15h3.17a1 1 0 0 1 0 2zM20 17h-4.17a1 1 0 0 1 0-2H19v-2.5a3 3 0 0 0-3-3h-.5a.5.5 0 0 1-.5-.5V7.5a.5.5 0 0 1 .5-.5H16a5 5 0 0 1 5 5V16a1 1 0 0 1-1 1z"/>
+                  </svg>
+                  <p className="italic text-white font-serif text-lg leading-relaxed px-2">{t.quote}</p>
+                  {/* Inline SVG for right quote */}
+                  <svg className="absolute -right-5 -bottom-2 text-2xl text-amber-300 opacity-60" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14.83 7H19a1 1 0 0 1 1 1v4.17A5 5 0 0 1 15 17h-.5a.5.5 0 0 1-.5-.5V15a.5.5 0 0 1 .5-.5H15a3 3 0 0 0 3-3V9h-3.17a1 1 0 0 1 0-2zM4 7h4.17a1 1 0 0 1 0 2H5v2.5a3 3 0 0 0 3 3h.5a.5.5 0 0 1 .5.5v1.5a.5.5 0 0 1-.5.5H8a5 5 0 0 1-5-5V8a1 1 0 0 1 1-1z"/>
+                  </svg>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Stats - Blue with animation */}
-      <section className="py-20 px-4 bg-blue-900">
-        <div className="container mx-auto max-w-5xl text-center animate-fadeInUp">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 font-serif">Our Achievements</h2>
-          <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
-            <AnimateSection className="flex-1" delay={0.05} from="bottom">
-              <div className="bg-white/10 rounded-2xl p-8 shadow flex flex-col items-center">
-              <Users className="h-10 w-10 text-white mb-2 animate-pulse" />
-              <span className="text-4xl font-bold text-white animate-fadeInUp">1000+</span>
-                <span className="text-lg text-white/80">Students Taught</span>
-            </div>
-            </AnimateSection>
-            <AnimateSection className="flex-1" delay={0.15} from="bottom">
-              <div className="bg-white/10 rounded-2xl p-8 shadow flex flex-col items-center">
-              <Globe className="h-10 w-10 text-amber-200 mb-2 animate-pulse" />
-              <span className="text-4xl font-bold text-amber-200 animate-fadeInUp">30+</span>
-                <span className="text-lg text-white/80">Countries Reached</span>
-            </div>
-            </AnimateSection>
-            <AnimateSection className="flex-1" delay={0.25} from="bottom">
-              <div className="bg-white/10 rounded-2xl p-8 shadow flex flex-col items-center">
-              <CheckCircle className="h-10 w-10 text-green-200 mb-2 animate-pulse" />
-              <span className="text-4xl font-bold text-green-200 animate-fadeInUp">10+</span>
-                <span className="text-lg text-white/80">Years Experience</span>
-            </div>
-            </AnimateSection>
-          </div>
-        </div>
-      </section>
-
       {/* Sample Class Video - Unique, eye-catching, premium Islamic accent */}
-      <section className="py-28 px-4 bg-white relative overflow-hidden">
+      <section className="py-28 px-4 bg-[#060957] relative overflow-hidden">
         {/* Soft diagonal gradient background accent */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-amber-100/10 to-blue-900/5 pointer-events-none select-none z-0" />
         {/* Islamic accent SVG deleted */}
@@ -543,13 +661,13 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-8 font-serif drop-shadow-lg" style={{ color: '#fbbf24' }}>Lisan-ul-Quran Academy</h2>
             </AnimateSection>
             {/* Quranic Ayat */}
-            <span className="font-arabic text-3xl md:text-4xl text-blue-900 drop-shadow-lg mb-2" style={{fontFamily: 'Amiri, serif', letterSpacing: '1px'}}>اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ</span>
-            <span className="text-blue-900 text-lg font-light mb-4 block drop-shadow-sm" style={{letterSpacing: '0.5px'}}>“Recite in the name of your Lord who created” <span className="text-blue-900/70">(Qur’an 96:1)</span></span>
-            <p className="text-lg text-blue-900/80 max-w-xl mb-6 animate-fadeInUp">Experience our teaching style, interactive lessons, and warm Islamic environment. Every class is designed to inspire and engage students of all ages.</p>
+            <span className="font-arabic text-3xl md:text-4xl text-white drop-shadow-lg mb-2" style={{fontFamily: 'Amiri, serif', letterSpacing: '1px'}}>اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ</span>
+            <span className="text-white text-lg font-light mb-4 block drop-shadow-sm" style={{letterSpacing: '0.5px'}}>"Recite in the name of your Lord who created" <span className="text-white/70">(Qur'an 96:1)</span></span>
+            <p className="text-lg text-white/80 max-w-xl mb-6 animate-fadeInUp">Experience our teaching style, interactive lessons, and warm Islamic environment. Every class is designed to inspire and engage students of all ages.</p>
             <AnimateSection className="flex gap-4 mt-2" delay={0.2} from="bottom">
-              <span className="bg-blue-900/10 text-blue-900 px-4 py-2 rounded-full text-sm font-semibold shadow">Live Demo</span>
-              <span className="bg-blue-900/10 text-blue-900 px-4 py-2 rounded-full text-sm font-semibold shadow">Interactive</span>
-              <span className="bg-blue-900/10 text-blue-900 px-4 py-2 rounded-full text-sm font-semibold shadow">Family Friendly</span>
+              <span className="bg-white/10 text-white px-4 py-2 rounded-full text-sm font-semibold shadow">Live Demo</span>
+              <span className="bg-white/10 text-white px-4 py-2 rounded-full text-sm font-semibold shadow">Interactive</span>
+              <span className="bg-white/10 text-white px-4 py-2 rounded-full text-sm font-semibold shadow">Family Friendly</span>
             </AnimateSection>
           </AnimateSection>
         </div>
@@ -564,11 +682,11 @@ export default function HomePage() {
               {[
                 {
                   q: "What courses do you offer?",
-                  a: "We offer Quran reading, Tajweed, Arabic language, Islamic studies, and more for all ages and levels."
+                  a: "We offer Quran reading, Tajweed, Arabic language, and Islamic studies for all ages and levels."
                 },
                 {
                   q: "How do I register?",
-                  a: "Simply fill out our online registration form and we'll contact you to schedule your free trial class."
+                  a: "You can register online using our registration form. We'll contact you to schedule your free trial class."
                 },
                 {
                   q: "Are classes one-on-one or group?",
@@ -577,6 +695,22 @@ export default function HomePage() {
                 {
                   q: "What if I miss a class?",
                   a: "We offer flexible rescheduling and makeup classes to fit your needs."
+                },
+                {
+                  q: "What platform are classes held on?",
+                  a: "All classes are conducted via Microsoft Teams. You will receive a Teams invite link after registration."
+                },
+                {
+                  q: "Do you provide certificates?",
+                  a: "Yes, we provide certificates upon successful completion of courses."
+                },
+                {
+                  q: "What are the technical requirements?",
+                  a: "You need a computer, tablet, or smartphone with internet access and Microsoft Teams installed."
+                },
+                {
+                  q: "How can I contact you?",
+                  a: "You can contact us via email at info@lisanulquran.com or through our contact form."
                 }
               ].map((item, idx) => (
                 <details key={idx} className="group rounded-xl shadow transition-all duration-300 border border-blue-700 bg-transparent">
@@ -584,89 +718,14 @@ export default function HomePage() {
                     {item.q}
                     <span className="ml-2 text-amber-400 transition-transform duration-300 group-open:rotate-90">&#9654;</span>
                   </summary>
-                  <div className="mt-3 text-blue-100 text-base leading-relaxed border-t border-blue-700 pt-3 animate-fadeInUp">
+                  <div className="mt-3 text-white text-base leading-relaxed border-t border-blue-700 pt-3 animate-fadeInUp">
                     {item.a}
                   </div>
-            </details>
+                </details>
               ))}
             </div>
           </div>
         </AnimateSection>
-      </section>
-
-      {/* Islamic Inspiration Section - Unique Modern Style */}
-      <section className="relative py-24 px-4 bg-gradient-to-br from-blue-50 via-amber-50 to-white overflow-hidden">
-        {/* Decorative geometric SVG accent */}
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 z-0 opacity-30 pointer-events-none">
-          <svg width="320" height="80" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 40 Q80 0 160 40 Q240 80 320 40" stroke="#fbbf24" strokeWidth="6" fill="none" />
-            <circle cx="160" cy="40" r="36" stroke="#060957" strokeWidth="2" fill="none" />
-          </svg>
-        </div>
-        <div className="container mx-auto max-w-2xl relative z-10 flex justify-center">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, type: 'spring', bounce: 0.4 }}
-            viewport={{ once: true }}
-            className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-900/10 p-12 flex flex-col items-center text-center"
-            style={{ boxShadow: '0 8px 40px 0 rgba(6,9,87,0.10)' }}
-          >
-            <span className="text-4xl md:text-5xl font-arabic text-blue-900 mb-6 drop-shadow-lg" style={{ fontFamily: 'Amiri, serif', letterSpacing: '1px' }}>
-              اقْرَأْ وَرَبُّكَ الْأَكْرَمُ
-            </span>
-            <span className="block h-1 w-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-amber-400 via-yellow-300 to-blue-900 opacity-80 shadow-md"></span>
-            <span className="text-xl md:text-2xl font-serif text-amber-500 font-semibold mb-2">“Read, and your Lord is the Most Generous.”</span>
-            <span className="text-blue-900/80 text-lg font-light">(Qur’an 96:3)</span>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA - White with animation */}
-      <section className="relative py-24 px-4 bg-white text-center overflow-hidden">
-        {/* Soft radial background accent */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-radial from-amber-100/60 via-white/80 to-transparent rounded-full blur-2xl" />
-        </div>
-        <div className="container mx-auto max-w-3xl relative z-10">
-          {/* Decorative Islamic geometric accent */}
-          <div className="flex justify-center mb-6">
-            <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 12 Q20 0 40 12 Q60 24 80 12" stroke="#fbbf24" strokeWidth="3" fill="none" />
-            </svg>
-          </div>
-          <motion.h2
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, type: 'spring' }}
-            viewport={{ once: true }}
-            className="text-5xl md:text-6xl font-extrabold mb-8 font-[Amiri] text-amber-500 drop-shadow-lg tracking-wide"
-            style={{ letterSpacing: '2px' }}
-          >
-            Begin Your Sacred Journey Today
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-2xl mb-10 text-blue-900/80 leading-relaxed max-w-2xl mx-auto font-sans tracking-wider"
-          >
-            Join thousands of students worldwide who have transformed their relationship with the Quran. Start with a free trial class and experience the difference of authentic Islamic education.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.4, type: 'spring', bounce: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <Link href="/register">
-              <button className="rounded-full px-14 py-6 text-2xl font-bold bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-white shadow-2xl hover:shadow-amber-400/50 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-amber-200/60 animate-pulse drop-shadow-lg">
-                Start Free Trial
-              </button>
-            </Link>
-          </motion.div>
-        </div>
       </section>
 
       {/* Contact - Blue with animation */}
@@ -707,6 +766,42 @@ export default function HomePage() {
           <div className="text-sm animate-fadeInUp">&copy; {new Date().getFullYear()} Lisan-ul-Quran Academy. All rights reserved.</div>
         </div>
       </footer>
+      {/* Floating Chatbot Button */}
+      <button
+        onClick={() => setChatOpen(true)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#060957] text-white shadow-xl flex items-center justify-center hover:bg-blue-900 transition-all duration-300 animate-fadeInUp"
+        aria-label="Open Chatbot"
+        style={{ display: chatOpen ? 'none' : 'flex' }}
+      >
+        {/* Chat Icon SVG */}
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 01-1.9 5.4 8.5 8.5 0 01-6.6 3.1 8.38 8.38 0 01-5.4-1.9L3 21l2.9-4.6A8.38 8.38 0 013 11.5 8.5 8.5 0 016.1 4.9 8.38 8.38 0 0111.5 3a8.5 8.5 0 018.5 8.5z" /></svg>
+      </button>
+      {/* Chatbot Modal */}
+      {chatOpen && (
+        <div className="fixed bottom-24 right-6 z-50 w-80 max-w-xs bg-white rounded-2xl shadow-2xl border border-blue-900 flex flex-col animate-fadeInUp">
+          <div className="flex items-center justify-between px-4 py-3 bg-[#060957] rounded-t-2xl">
+            <span className="text-white font-bold">Lisan-ul-Quran Chatbot</span>
+            <button onClick={() => setChatOpen(false)} className="text-white hover:text-amber-400 text-xl font-bold">×</button>
+          </div>
+          <div className="flex-1 px-4 py-3 overflow-y-auto max-h-60" style={{ minHeight: '120px' }}>
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`mb-2 flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <span className={`px-3 py-2 rounded-xl text-sm ${msg.from === 'user' ? 'bg-blue-100 text-blue-900' : 'bg-blue-900 text-white'}`}>{msg.text}</span>
+              </div>
+            ))}
+          </div>
+          <form onSubmit={handleChatSend} className="flex border-t border-blue-100">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-bl-2xl outline-none text-blue-900"
+              placeholder="Type your message..."
+            />
+            <button type="submit" className="px-4 text-[#060957] font-bold hover:text-amber-500">Send</button>
+          </form>
+        </div>
+      )}
     </div>
   )
 }

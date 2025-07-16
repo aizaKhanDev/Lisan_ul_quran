@@ -16,7 +16,6 @@ export default function Header() {
     { name: "Courses", href: "/courses" },
     { name: "Classes", href: "/classes" },
     { name: "Register", href: "/register" },
-    { name: "Contact", href: "/contact" },
   ]
 
   return (

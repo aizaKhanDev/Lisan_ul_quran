@@ -1,22 +1,11 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { BookOpen, MessageCircle, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react"
+import { BookOpen, MessageCircle, Mail, Facebook, Instagram, Youtube } from "lucide-react"
 
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-white">
-      {/* WhatsApp Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <a
-          href="https://wa.me/447123456789?text=Hi, I need help with Lisan ul Quran Academy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
-        >
-          <MessageCircle className="h-6 w-6 text-white" />
-        </a>
-      </div>
 
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-16">
@@ -24,11 +13,7 @@ export default function Footer() {
           {/* Company Info */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="relative w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-4 bg-amber-400 rounded-sm flex items-center justify-center">
-                  <BookOpen className="h-3 w-3 text-blue-900" />
-                </div>
-              </div>
+              <img src="/logo.jpg" alt="Lisan ul Quran Logo" className="w-10 h-10 rounded-lg object-cover" />
               <div>
                 <div className="text-lg font-bold">Lisan ul Quran</div>
                 <div className="text-sm text-slate-400">Online Academy</div>
@@ -36,20 +21,15 @@ export default function Footer() {
             </div>
             <p className="text-slate-300 leading-relaxed">
               Authentic Islamic education through modern technology. Learn Quran, Arabic, and Islamic studies with
-              qualified teachers from the comfort of your home.
+              qualified teachers from the comfort of your home.<br/>
+              <span className="block mt-2 text-amber-300">All teachers educated in Wafaq ul Madaris.</span>
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
+              <a href="https://www.facebook.com/profile.php?id=61578041309911" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
+              <a href="https://www.instagram.com/onlinequran.lisan?igsh=dHM1c3prbmg5cHB4" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">
                 <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                <Youtube className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -92,27 +72,17 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link href="/courses" className="text-slate-300 hover:text-white transition-colors">
-                  Quran Recitation
+                  Quran Reading (Nazra)
                 </Link>
               </li>
               <li>
                 <Link href="/courses" className="text-slate-300 hover:text-white transition-colors">
-                  Quran Memorization
+                  Quran Memorization (Hifz)
                 </Link>
               </li>
               <li>
                 <Link href="/courses" className="text-slate-300 hover:text-white transition-colors">
-                  Tajweed Mastery
-                </Link>
-              </li>
-              <li>
-                <Link href="/courses" className="text-slate-300 hover:text-white transition-colors">
-                  Arabic Language
-                </Link>
-              </li>
-              <li>
-                <Link href="/courses" className="text-slate-300 hover:text-white transition-colors">
-                  Kids Program
+                  Tajweed Excellence
                 </Link>
               </li>
             </ul>
@@ -126,14 +96,14 @@ export default function Footer() {
                 <MessageCircle className="h-5 w-5 text-green-400" />
                 <div>
                   <div className="text-sm text-slate-300">WhatsApp</div>
-                  <div className="text-sm text-white">+44 7123 456789</div>
+                  <div className="text-sm text-white">+92 316 5249017</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-400" />
                 <div>
                   <div className="text-sm text-slate-300">Email</div>
-                  <div className="text-sm text-white">info@lisanulquran.com</div>
+                  <div className="text-sm text-white">onlinelisanquran@gmail.com</div>
                 </div>
               </div>
             </div>

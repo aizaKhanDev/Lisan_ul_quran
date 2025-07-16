@@ -1,8 +1,10 @@
+"use client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { BookOpen, Clock, Users, Star, CheckCircle, Globe, Award, Heart } from "lucide-react"
 import Link from "next/link"
+import { motion } from "framer-motion";
 
 export default function CoursesPage() {
   const courses = [
@@ -93,92 +95,6 @@ export default function CoursesPage() {
       usaTime: "3:00 PM - 4:00 PM EST",
       teacher: "Ustadh Muhammad Al-Qari",
     },
-    {
-      id: 4,
-      title: "Arabic Language Mastery",
-      subtitle: "Unlock the Language of the Quran",
-      description:
-        "Comprehensive Arabic language course from basics to advanced conversation and Quranic understanding",
-      duration: "12-18 months",
-      level: "All Levels",
-      students: 150,
-      rating: 4.7,
-      price: "£45/month",
-      originalPrice: "£55/month",
-      features: [
-        "Arabic grammar (Nahw) fundamentals",
-        "Vocabulary building (3000+ words)",
-        "Conversation practice sessions",
-        "Reading comprehension skills",
-        "Writing and composition",
-        "Quranic Arabic focus",
-        "Cultural context understanding",
-        "Fluency development program",
-      ],
-      highlights: ["Comprehensive", "Quranic Focus"],
-      color: "border-purple-200 bg-gradient-to-br from-purple-50 to-white",
-      icon: Globe,
-      ukTime: "5:00 PM - 6:30 PM",
-      usaTime: "12:00 PM - 1:30 PM EST",
-      teacher: "Ustadha Fatima Zahra",
-    },
-    {
-      id: 5,
-      title: "Islamic Studies Foundation",
-      subtitle: "Comprehensive Islamic Education",
-      description: "Complete Islamic education covering Aqeedah, Fiqh, Seerah, and contemporary Islamic issues",
-      duration: "10-15 months",
-      level: "All Levels",
-      students: 100,
-      rating: 4.8,
-      price: "£35/month",
-      originalPrice: "£45/month",
-      features: [
-        "Islamic beliefs (Aqeedah) fundamentals",
-        "Islamic jurisprudence (Fiqh) basics",
-        "Prophet's biography (Seerah) study",
-        "Islamic history and civilization",
-        "Contemporary Islamic issues",
-        "Hadith studies introduction",
-        "Islamic ethics and character",
-        "Practical Islamic living",
-      ],
-      highlights: ["Foundation Course", "Practical Islam"],
-      color: "border-red-200 bg-gradient-to-br from-red-50 to-white",
-      icon: Award,
-      ukTime: "4:00 PM - 5:00 PM",
-      usaTime: "11:00 AM - 12:00 PM EST",
-      teacher: "Ustadh Ahmad Ibn Yusuf",
-    },
-    {
-      id: 6,
-      title: "Kids Quran Adventure",
-      subtitle: "Fun Islamic Learning for Children",
-      description:
-        "Special program designed for children aged 5-12 with interactive games, stories, and engaging activities",
-      duration: "Ongoing",
-      level: "Kids (5-12 years)",
-      students: 250,
-      rating: 4.9,
-      price: "£30/month",
-      originalPrice: "£40/month",
-      features: [
-        "Interactive learning games",
-        "Colorful digital materials",
-        "Short focused sessions (30 min)",
-        "Reward and achievement system",
-        "Parent progress reports",
-        "Islamic stories and values",
-        "Fun competitions and activities",
-        "Age-appropriate curriculum",
-      ],
-      highlights: ["Kids Special", "Interactive Fun"],
-      color: "border-pink-200 bg-gradient-to-br from-pink-50 to-white",
-      icon: Heart,
-      ukTime: "4:00 PM - 4:30 PM",
-      usaTime: "11:00 AM - 11:30 AM EST",
-      teacher: "Ustadha Fatima Zahra",
-    },
   ]
 
   const getBadgeColor = (level: string) => {
@@ -211,108 +127,115 @@ export default function CoursesPage() {
 
         {/* Courses Grid */}
         <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-16">
-          {courses.map((course) => (
-            <Card
+          {courses.map((course, i) => (
+            <motion.div
               key={course.id}
-              className={`border-2 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 ${course.color} relative overflow-hidden`}
+              initial={{ y: 60, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ type: "spring", bounce: 0.4, duration: 0.8, delay: i * 0.15 }}
+              viewport={{ once: true, amount: 0.4 }}
             >
-              {/* Highlights */}
-              <div className="absolute top-4 right-4 flex flex-col gap-2">
-                {course.highlights.map((highlight, index) => (
-                  <Badge key={index} className="bg-blue-900 text-white text-xs px-2 py-1">
-                    {highlight}
-                  </Badge>
-                ))}
-              </div>
-
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                    <course.icon className="h-6 w-6 text-blue-900" />
-                  </div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    <span className="font-medium">{course.rating}</span>
-                  </div>
+              <Card
+                className={`border-2 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 ${course.color} relative overflow-hidden`}
+              >
+                {/* Highlights */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2">
+                  {course.highlights.map((highlight, index) => (
+                    <Badge key={index} className="bg-blue-900 text-white text-xs px-2 py-1">
+                      {highlight}
+                    </Badge>
+                  ))}
                 </div>
 
-                <Badge className={getBadgeColor(course.level)} variant="secondary">
-                  {course.level}
-                </Badge>
-
-                <CardTitle className="text-xl text-slate-800 font-arabic mt-2">{course.title}</CardTitle>
-                <CardDescription className="text-blue-600 font-medium text-sm">{course.subtitle}</CardDescription>
-                <CardDescription className="text-slate-600 leading-relaxed mt-2">{course.description}</CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                {/* Course Info */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Clock className="h-4 w-4" />
-                    <span>{course.duration}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Users className="h-4 w-4" />
-                    <span>{course.students} students</span>
-                  </div>
-                </div>
-
-                {/* Schedule */}
-                <div className="bg-white/50 rounded-lg p-3 space-y-2">
-                  <div className="text-sm font-medium text-slate-800">Class Schedule:</div>
-                  <div className="text-sm text-slate-600">
-                    <div>🇬🇧 UK: {course.ukTime}</div>
-                    <div>🇺🇸 USA: {course.usaTime}</div>
-                  </div>
-                  <div className="text-sm text-blue-600 font-medium">Teacher: {course.teacher}</div>
-                </div>
-
-                {/* Features Preview */}
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-slate-800 text-sm">What you'll learn:</h4>
-                  <ul className="space-y-1">
-                    {course.features.slice(0, 4).map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm text-slate-600">
-                        <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                    {course.features.length > 4 && (
-                      <li className="text-sm text-slate-500 ml-5">+{course.features.length - 4} more features</li>
-                    )}
-                  </ul>
-                </div>
-
-                {/* Pricing */}
-                <div className="pt-4 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-slate-800">{course.price}</span>
-                        <span className="text-lg text-slate-400 line-through">{course.originalPrice}</span>
-                      </div>
-                      <div className="text-sm text-green-600 font-medium">Save 20% - Limited Time</div>
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                      <course.icon className="h-6 w-6 text-blue-900" />
+                    </div>
+                    <div className="flex items-center gap-1 text-sm">
+                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                      <span className="font-medium">{course.rating}</span>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Link href="/register" className="block">
-                      <Button className="w-full bg-blue-900 hover:bg-blue-800 text-white rounded-lg py-6">
-                        <BookOpen className="mr-2 h-4 w-4" />
-                        Enroll Now
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="outline"
-                      className="w-full border-slate-300 text-slate-700 hover:bg-slate-50 bg-white/80 rounded-lg"
-                    >
-                      Free Trial Class
-                    </Button>
+                  <Badge className={getBadgeColor(course.level)} variant="secondary">
+                    {course.level}
+                  </Badge>
+
+                  <CardTitle className="text-xl text-slate-800 font-arabic mt-2">{course.title}</CardTitle>
+                  <CardDescription className="text-blue-600 font-medium text-sm">{course.subtitle}</CardDescription>
+                  <CardDescription className="text-slate-600 leading-relaxed mt-2">{course.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="space-y-6">
+                  {/* Course Info */}
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Clock className="h-4 w-4" />
+                      <span>{course.duration}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Users className="h-4 w-4" />
+                      <span>{course.students} students</span>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+
+                  {/* Schedule */}
+                  <div className="bg-white/50 rounded-lg p-3 space-y-2">
+                    <div className="text-sm font-medium text-slate-800">Class Schedule:</div>
+                    <div className="text-sm text-slate-600">
+                      <div>🇬🇧 UK: {course.ukTime}</div>
+                      <div>🇺🇸 USA: {course.usaTime}</div>
+                    </div>
+                    <div className="text-sm text-green-700 font-medium">Teacher certified by Wafaq ul Madaris</div>
+                    <a
+                      href="https://teams.live.com/l/invite/FEAUg-LwLJlBFRYsAI?v=g1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-2 px-4 py-2 bg-blue-900 text-white rounded-lg font-semibold text-xs hover:bg-blue-800 transition"
+                    >
+                      Join Class on Microsoft Teams
+                    </a>
+                  </div>
+
+                  {/* Features Preview */}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-slate-800 text-sm">What you'll learn:</h4>
+                    <ul className="space-y-1">
+                      {course.features.slice(0, 4).map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2 text-sm text-slate-600">
+                          <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                      {course.features.length > 4 && (
+                        <li className="text-sm text-slate-500 ml-5">+{course.features.length - 4} more features</li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="pt-4 border-t border-slate-200">
+                    {/* Price section removed as per request */}
+
+                    <div className="space-y-2">
+                      <Link href="/register" className="block">
+                        <Button className="w-full bg-blue-900 hover:bg-blue-800 text-white rounded-lg py-6">
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          Enroll Now
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        className="w-full border-slate-300 text-slate-700 hover:bg-slate-50 bg-white/80 rounded-lg"
+                      >
+                        Free Trial Class
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
@@ -326,60 +249,123 @@ export default function CoursesPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-                <BookOpen className="h-8 w-8 text-blue-900" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Authentic Curriculum</h3>
-              <p className="text-sm text-slate-600">Based on traditional Islamic scholarship</p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Users className="h-8 w-8 text-amber-600" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Expert Teachers</h3>
-              <p className="text-sm text-slate-600">Qualified Islamic scholars and educators</p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Clock className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Flexible Schedule</h3>
-              <p className="text-sm text-slate-600">UK & USA friendly timings</p>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Award className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-slate-800">Certification</h3>
-              <p className="text-sm text-slate-600">Recognized Islamic education certificates</p>
-            </div>
+            {[{
+              icon: <BookOpen className="h-8 w-8 text-blue-900" />, bg: "bg-blue-100", title: "Authentic Curriculum", desc: "Based on traditional Islamic scholarship"
+            }, {
+              icon: <Users className="h-8 w-8 text-amber-600" />, bg: "bg-amber-100", title: "Expert Teachers", desc: "Qualified Islamic scholars and educators"
+            }, {
+              icon: <Clock className="h-8 w-8 text-green-600" />, bg: "bg-green-100", title: "Flexible Schedule", desc: "UK & USA friendly timings"
+            }, {
+              icon: <Award className="h-8 w-8 text-purple-600" />, bg: "bg-purple-100", title: "Certification", desc: "Recognized Islamic education certificates"
+            }].map((item, i) => (
+              <motion.div
+                key={item.title}
+                className="text-center space-y-3"
+                initial={{ y: 60, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.4, duration: 0.8, delay: i * 0.15 }}
+                viewport={{ once: true, amount: 0.4 }}
+              >
+                <div className={`w-16 h-16 ${item.bg} rounded-2xl flex items-center justify-center mx-auto`}>
+                  {item.icon}
+                </div>
+                <h3 className="font-semibold text-slate-800">{item.title}</h3>
+                <p className="text-sm text-slate-600">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 rounded-3xl p-8 lg:p-12 text-center text-white relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-20 h-20 border border-white rounded-full"></div>
-            <div className="absolute bottom-10 right-10 w-16 h-16 border border-amber-400 rounded-lg rotate-45"></div>
+        {/* Course Comparison Table Section */}
+        <motion.div
+          className="mb-16 rounded-3xl p-8"
+          style={{ backgroundColor: '#060957' }}
+          initial={{ x: -100, opacity: 0 }}
+          whileInView={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          viewport={{ once: true, amount: 0.4 }}
+        >
+          <div className="text-center mb-8">
+            <Badge className="bg-white/20 text-white px-4 py-2 mb-4">Compare Courses</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white font-arabic mb-2">Find Your Best Fit</h2>
+            <p className="text-blue-100 max-w-2xl mx-auto">See how our courses differ in focus, duration, and level to help you choose the perfect program for your needs.</p>
           </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white/10 rounded-2xl shadow-md text-sm text-white">
+              <thead>
+                <tr className="bg-white/20">
+                  <th className="py-3 px-4 text-left font-semibold">Course</th>
+                  <th className="py-3 px-4 text-left font-semibold">Level</th>
+                  <th className="py-3 px-4 text-left font-semibold">Duration</th>
+                  <th className="py-3 px-4 text-left font-semibold">Focus</th>
+                  <th className="py-3 px-4 text-left font-semibold">Key Feature</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-white/20">
+                  <td className="py-3 px-4 font-medium text-blue-200">Quran Reading (Nazra)</td>
+                  <td className="py-3 px-4">Beginner</td>
+                  <td className="py-3 px-4">6-12 months</td>
+                  <td className="py-3 px-4">Recitation & Tajweed Basics</td>
+                  <td className="py-3 px-4">Digital Quran with Audio</td>
+                </tr>
+                <tr className="border-b border-white/20">
+                  <td className="py-3 px-4 font-medium text-blue-200">Quran Memorization (Hifz)</td>
+                  <td className="py-3 px-4">Intermediate</td>
+                  <td className="py-3 px-4">2-4 years</td>
+                  <td className="py-3 px-4">Memorization & Revision</td>
+                  <td className="py-3 px-4">Ijazah Pathway</td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-medium text-blue-200">Tajweed Excellence</td>
+                  <td className="py-3 px-4">Advanced</td>
+                  <td className="py-3 px-4">8-12 months</td>
+                  <td className="py-3 px-4">Advanced Tajweed & Qira'at</td>
+                  <td className="py-3 px-4">Voice Coaching</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
 
-          <div className="relative">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 font-arabic">Not Sure Which Course to Choose?</h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Our educational consultants are here to help you find the perfect course based on your current level,
-              learning goals, and schedule preferences.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/contact">
-                <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-6 rounded-xl">
-                  Get Free Consultation
-                </Button>
-              </Link>
-            </div>
+        {/* Learning Pathways Section */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <Badge className="bg-green-100 text-green-800 px-4 py-2 mb-4">Learning Pathways</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 font-arabic mb-2">Your Journey, Step by Step</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Progress from beginner to advanced with our structured learning pathways. Each step builds your skills and confidence.</p>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+            {[
+              {
+                icon: <BookOpen className="h-7 w-7 text-blue-900" />, bg: "bg-blue-100", step: "Step 1", color: "text-blue-900", title: "Quran Reading (Nazra)", desc: "Learn the basics of recitation and Tajweed."
+              },
+              {
+                icon: <Star className="h-7 w-7 text-amber-600" />, bg: "bg-amber-100", step: "Step 2", color: "text-amber-700", title: "Tajweed Excellence", desc: "Perfect your recitation and pronunciation."
+              },
+              {
+                icon: <Award className="h-7 w-7 text-green-600" />, bg: "bg-green-100", step: "Step 3", color: "text-green-700", title: "Quran Memorization (Hifz)", desc: "Memorize and master the Holy Quran."
+              }
+            ].map((item, i) => (
+              <motion.div
+                key={item.step}
+                className="flex flex-col items-center"
+                initial={{ y: 60, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.4, duration: 0.8, delay: i * 0.15 }}
+                viewport={{ once: true, amount: 0.4 }}
+              >
+                <div className={`w-14 h-14 ${item.bg} rounded-full flex items-center justify-center mb-2`}>
+                  {item.icon}
+                </div>
+                <div className={`font-semibold ${item.color}`}>{item.step}</div>
+                <div className="text-xs text-slate-600 text-center">{item.title}<br />{item.desc}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
+
+        {/* CTA Section removed as per request */}
       </div>
     </div>
   )
